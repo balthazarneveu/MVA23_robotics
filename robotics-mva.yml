@@ -1,4 +1,4 @@
-name: robotics-mva
+name: robotics
 channels:
   - conda-forge
   - defaults
