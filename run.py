@@ -10,7 +10,7 @@ from pinocchio.utils import rotate
 from world import add_obstacles_reduced, add_obstacles_hard, add_special_locations
 from pinocchio.robot_wrapper import RobotWrapper
 from rrt import RRT
-
+from birrt import BiRRT
 def initialize_problem(reduced=False) -> Tuple[RobotWrapper, MeshcatVisualizer]:
     """Initialize a world with a ur5 robot
 
@@ -64,12 +64,23 @@ def main(reduced=True):
         ]
     )
     system = solve(robot, viz, q_i, q_g, reduced=reduced)
-    if False:
-        system.display_edge(q_i, q_g)
-        while True:
-            time.sleep(0.5)
-            system.display_motion([q_i, q_g], step=0.5)
+    eps_final = .1
+    def validation(key):
+        vec = robot.framePlacement(key, 22).translation - robot.framePlacement(q_g, 22).translation
+        return (float(np.linalg.norm(vec)) < eps_final)
     
+    birrt = BiRRT(
+        system,
+        l_min=0.2,
+        l_max=0.5,
+        steer_delta=0.1,
+        iter_max=5
+    )
+    
+    
+
+    birrt.solve(q_i, qg=q_g)
+    return
     rrt = RRT(
         system,
         N_bias=20,
@@ -77,10 +88,6 @@ def main(reduced=True):
         l_max=0.5,
         steer_delta=0.1,
     )
-    eps_final = .1
-    def validation(key):
-        vec = robot.framePlacement(key, 22).translation - robot.framePlacement(q_g, 22).translation
-        return (float(np.linalg.norm(vec)) < eps_final)
 
     rrt.solve(q_i, validation, qg=q_g)
     while True:

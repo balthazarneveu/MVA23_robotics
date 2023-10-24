@@ -118,7 +118,8 @@ class System():
     # Visualization functions
     # --------------------------------------------------------------------------------
     def add_visualizer(self, viz):
-        self.viz = viz
+        self.viz = viz # Avoids using global variables
+
     def reset(self):
         """
         Reset the system visualization
@@ -128,7 +129,7 @@ class System():
             self.viz.delete(f"world/cil{i}")
         self.display_count = 0
     
-    def display_edge(self, q1: np.ndarray, q2: np.ndarray, radius=0.01, color=[1.,0.,0.,1]):
+    def display_edge(self, q1: np.ndarray, q2: np.ndarray, radius=0.01, color=[0., 1., 0., 1]):
         """Visualize an edge"""
         M1 = self.robot.framePlacement(q1, 22)  # Placement of the end effector tip.
         M2 = self.robot.framePlacement(q2, 22)  # Placement of the end effector tip.
@@ -143,8 +144,8 @@ class System():
         self.viz.addSphere(name, radius, [1.,0.,0.,1])
         self.viz.applyConfiguration(name,M2)
         name = f"world/cil{self.display_count}"
-        self.viz.addCylinder(name, length, radius / 4, [0., 1., 0., 1])
-        self.viz.applyConfiguration(name,Mcyl)
+        self.viz.addCylinder(name, length, radius / 4, color)
+        self.viz.applyConfiguration(name, Mcyl)
         self.display_count +=1
         
     def display_motion(self, qs: np.ndarray, step=1e-1):

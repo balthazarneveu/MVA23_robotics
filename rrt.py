@@ -1,7 +1,6 @@
 import numpy as np
 from system import System
 from typing import Callable
-from utils.meshcat_viewer_wrapper import MeshcatVisualizer, colors
 from utils.datastructures.storage import Storage
 from utils.datastructures.pathtree import PathTree
 from utils.datastructures.mtree import MTree
@@ -111,7 +110,7 @@ class RRT():
 
         Args:
             qi (np.ndarray): initial configuration
-            validate (Callable): function which returns 
+            validate (Callable): function which returns True if you reach your target
             qg (np.ndarray, optional): goal/target configuration. 
             Defaults to None (validate may be enough to contain the fact of reaching the target).
             Goal is required when using the N_bias
