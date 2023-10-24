@@ -8,16 +8,16 @@ from utils.meshcat_viewer_wrapper import MeshcatVisualizer, colors
 from system import System
 from pinocchio.utils import rotate
 from world import add_obstacles_reduced, add_obstacles_hard, add_special_locations
+from pinocchio.robot_wrapper import RobotWrapper
 
-def init_problem(reduced=False):
-    
-    """_summary_
+def initialize_problem(reduced=False) -> Tuple[RobotWrapper, MeshcatVisualizer]:
+    """Initialize a world with a ur5 robot
 
     Args:
         reduced (bool, optional): Simplified problem. Defaults to False.
 
     Returns:
-        _type_: _description_
+        robot, viz
     """
     robot = robex.load('ur5')
     if reduced:
@@ -37,10 +37,12 @@ def init_problem(reduced=False):
     return robot, viz
 
 
-def solve(robot):
+def solve(robot, viz, q_i, q_g):
     system = System(robot)
+    system.add_visualizer(viz)
+    system.display_motion([q_i, q_g])
     print(system.distance(np.array([[-np.pi+0.1], [0.]]), np.array([[np.pi-0.1]])))
-
+    return system
 def main(reduced=True):
     if reduced:
         q_i= np.deg2rad([-90., 40.])
@@ -48,7 +50,7 @@ def main(reduced=True):
     else:
         q_i = np.array([1., -1.5, 2.1, -.5, -.5, 0])
         q_g = np.array([3., -1., 1, -.5, -.5, 0])
-    robot, viz = init_problem(reduced=reduced)
+    robot, viz = initialize_problem(reduced=reduced)
     add_special_locations(
         robot,
         viz,
@@ -57,9 +59,11 @@ def main(reduced=True):
             (q_g, "goal", "green")
         ]
     )
-    solve(robot)
+    system = solve(robot, viz, q_i, q_g)
+    system.display_edge(q_i, q_g)
     while True:
-        time.sleep(0.1)
+        time.sleep(0.5)
+        system.display_motion([q_i, q_g], step=0.5)
 if __name__ == "__main__":
-    main(reduced=False)
+    main(reduced=True)
     
