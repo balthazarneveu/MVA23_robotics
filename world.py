@@ -5,6 +5,7 @@ import pinocchio as pin
 import time
 from tqdm import tqdm
 from typing import Union, List, Tuple, Callable
+import itertools
 
 from utils.meshcat_viewer_wrapper import MeshcatVisualizer, colors
 from system import System
@@ -31,6 +32,14 @@ def add_obstacles_reduced(robot):
         robot.collision_model.addGeometryObject(obs)  # Add object to collision model
         robot.visual_model   .addGeometryObject(obs)  # Add object to visual model
 
+    ### Collision pairs
+    nobs = len(oMobs)
+    nbodies = robot.collision_model.ngeoms-nobs
+    robotBodies = range(nbodies)
+    envBodies = range(nbodies,nbodies+nobs) 
+    robot.collision_model.removeAllCollisionPairs()
+    for a,b in itertools.product(robotBodies,envBodies):
+        robot.collision_model.addCollisionPair(pin.CollisionPair(a,b))
 # HARD CASE (6 degrees of freedom)
 def add_obstacles_hard(robot):
     def addCylinderToUniverse(name, radius, length, placement, color=colors.red):
