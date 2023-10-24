@@ -9,14 +9,14 @@ import pinocchio as pin
 
 
 class System():
-    def __init__(self, robot: RobotWrapper):
+    def __init__(self, robot: RobotWrapper, dof=6):
         self.robot = robot
         robot.gmodel = robot.collision_model
         self.display_edge_count = 0
         self.colwrap = CollisionWrapper(robot)  # For collision checking
         self.nq = self.robot.nq
         self.display_count = 0
-        self.dof = 6 # degrees of freedom
+        self.dof = dof # degrees of freedom
     
     @staticmethod
     def distance(q1: np.ndarray, q2: np.ndarray) -> Union[float, np.array]:

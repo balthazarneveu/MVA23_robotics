@@ -9,6 +9,7 @@ from system import System
 from pinocchio.utils import rotate
 from world import add_obstacles_reduced, add_obstacles_hard, add_special_locations
 from pinocchio.robot_wrapper import RobotWrapper
+from rrt import RRT
 
 def initialize_problem(reduced=False) -> Tuple[RobotWrapper, MeshcatVisualizer]:
     """Initialize a world with a ur5 robot
@@ -37,15 +38,17 @@ def initialize_problem(reduced=False) -> Tuple[RobotWrapper, MeshcatVisualizer]:
     return robot, viz
 
 
-def solve(robot, viz, q_i, q_g):
-    system = System(robot)
+def solve(robot, viz, q_i, q_g, reduced=False):
+    system = System(robot, dof=2 if reduced else 6)
     system.add_visualizer(viz)
     system.display_motion([q_i, q_g])
-    print(system.distance(np.array([[-np.pi+0.1], [0.]]), np.array([[np.pi-0.1]])))
+    # print(system.distance(np.array([[-np.pi+0.1], [0.]]), np.array([[np.pi-0.1]])))
     return system
+
 def main(reduced=True):
     if reduced:
-        q_i= np.deg2rad([-90., 40.])
+        q_i= np.deg2rad([90., 0.])
+        # q_i= np.deg2rad([-90., 40.])
         q_g= np.deg2rad([-79., 64.])
     else:
         q_i = np.array([1., -1.5, 2.1, -.5, -.5, 0])
@@ -59,11 +62,29 @@ def main(reduced=True):
             (q_g, "goal", "green")
         ]
     )
-    system = solve(robot, viz, q_i, q_g)
-    system.display_edge(q_i, q_g)
+    system = solve(robot, viz, q_i, q_g, reduced=reduced)
+    if False:
+        system.display_edge(q_i, q_g)
+        while True:
+            time.sleep(0.5)
+            system.display_motion([q_i, q_g], step=0.5)
+    
+    rrt = RRT(
+        system,
+        N_bias=20,
+        l_min=0.2,
+        l_max=0.5,
+        steer_delta=0.1,
+    )
+    eps_final = .1
+    def validation(key):
+        vec = robot.framePlacement(key, 22).translation - robot.framePlacement(q_g, 22).translation
+        return (float(np.linalg.norm(vec)) < eps_final)
+
+    rrt.solve(q_i, validation, qg=q_g)
     while True:
         time.sleep(0.5)
-        system.display_motion([q_i, q_g], step=0.5)
+        system.display_motion(rrt.get_path(q_g))
 if __name__ == "__main__":
     main(reduced=True)
     
