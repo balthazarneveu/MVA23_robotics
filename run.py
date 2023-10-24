@@ -34,8 +34,7 @@ def initialize_problem(reduced=False) -> Tuple[RobotWrapper, MeshcatVisualizer]:
         add_obstacles_reduced(robot)
     else:
         add_obstacles_hard(robot)
-    viz = MeshcatVisualizer(robot)
-    return robot, viz
+    return robot
 
 
 def solve(robot, viz, q_i, q_g, reduced=False):
@@ -47,13 +46,15 @@ def solve(robot, viz, q_i, q_g, reduced=False):
 
 def main(reduced=True):
     if reduced:
-        q_i= np.deg2rad([90., 0.])
-        # q_i= np.deg2rad([-90., 40.])
+        # q_i= np.deg2rad([90., 0.])
+        # q_i= np.deg2rad([-90., 40.]) # EASY
+        q_i= np.deg2rad([179., 0.]) #NOT EASY
         q_g= np.deg2rad([-79., 64.])
     else:
         q_i = np.array([1., -1.5, 2.1, -.5, -.5, 0])
         q_g = np.array([3., -1., 1, -.5, -.5, 0])
-    robot, viz = initialize_problem(reduced=reduced)
+    robot = initialize_problem(reduced=reduced)
+    viz = MeshcatVisualizer(robot)
     add_special_locations(
         robot,
         viz,
