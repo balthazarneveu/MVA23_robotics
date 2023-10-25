@@ -135,6 +135,7 @@ class BiRRT():
                 q_prox_idx = self.storage[direction].add_point(q_prox) # add the q_prox point to the storage, get new index
                 self.trees[direction].add_point(q_prox_idx) # add the node q_prox to the graph
                 self.pathtrees[direction].update_link(q_prox_idx, q_near_idx)
+                
                 self.system.display_edge(
                     self.storage[direction][q_near_idx],
                     self.storage[direction][q_prox_idx], 
@@ -160,19 +161,18 @@ class BiRRT():
                         nearest_oppo,
                         l_min=None,
                         l_max=None,
-                        eps=0.1
+                        eps=0.1 #@TODO: WARNING ON ACCURACY!!!! We can simply loop!
                     )
                     if success:
-                        print(f"DONE! Bridge found between {newest} {nearest_oppo}")
-                        bridge_index = self.storage[direction].add_point(nearest_oppo) #ADD THE BRIDGE! add the nearest_oppo to the current graph
-                        # self.pathtrees[direction].update_link(q_prox_idx, bridge_index)
+                        print(f"DONE! {dir} Bridge found between {newest} {nearest_oppo}")
+                        bridge_index = self.storage[dir].add_point(nearest_oppo) #ADD THE BRIDGE! add the nearest_oppo to the current graph
+                        self.pathtrees[dir].update_link(bridge_index, q_prox_idx) #Update the bridge
                         self.found = True # WE HAVE A PATH!
                         self.system.display_edge(newest, nearest_oppo, radius=0.015, color=[0., 0., 1., 1.])
                         break
         return self.found
     def get_path(self):
-        # assert self.found
+        assert self.found
         forward_path = self.pathtrees["forward"].get_path()
         backward_path = self.pathtrees["backward"].get_path()
-        print(forward_path, backward_path[::-1])
         return np.concatenate([forward_path, backward_path[::-1]])

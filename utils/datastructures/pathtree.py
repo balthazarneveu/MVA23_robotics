@@ -31,7 +31,7 @@ class PathTree:
 
     def get_edges(self):
         # TODO use yielding to avoid data overcreation
-        res = np.zeros((self.storage.n - 1, 2, self.storage.dim), dtype=np.float)
+        res = np.zeros((self.storage.n - 1, 2, self.storage.dim), dtype=np.float32)
         res[:, 0, :] = self.storage.data[1:self.storage.n, :]
         res[:, 1, :] = self.storage.data[self.parent[1:self.storage.n], :]
 
