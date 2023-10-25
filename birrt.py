@@ -117,15 +117,19 @@ class BiRRT():
                 if self.found:
                     break
                 q_near_idx, _d_fwd = self.trees[direction].nearest_neighbour(q_new_idx) # q_new_idx = -1
-                # if direction==FWD:
-                #     print(q_near_idx)
-                success, q_prox = self.system.is_free_path(
-                    self.storage[direction].data[q_near_idx],
-                    q_new,
-                    l_min=self.l_min,
-                    l_max=self.l_max,
-                    eps=self.steer_delta
-                )
+                for delta_ratio in [1., 1/2., 1./4.]:
+                    # Progressive refinement of the path collision check.
+                    # Allows to quickly discard impossible solutions
+                    success, q_prox = self.system.is_free_path(
+                        self.storage[direction].data[q_near_idx],
+                        q_new,
+                        l_min=self.l_min,
+                        l_max=self.l_max,
+                        eps=self.steer_delta*delta_ratio
+                    )
+                    if not success:
+                        break
+
                 if not success:
                     # print(f"{direction}: FAILED TO CREATE A NEW BRANCH STEERING IN THE q_new direction")
                     self.it_trace.append(0)
@@ -156,13 +160,16 @@ class BiRRT():
                     self._candidate = newest
                     nearest_idx_oppo, _ = self.trees[oppo_dir].nearest_neighbour(-1) # find nearest neighbor in the opposite tree
                     nearest_oppo = self.storage[oppo_dir].data[nearest_idx_oppo]
-                    success, _ = self.system.is_free_path(
-                        newest,
-                        nearest_oppo,
-                        l_min=None,
-                        l_max=None,
-                        eps=0.1 #@TODO: WARNING ON ACCURACY!!!! We can simply loop!
-                    )
+                    for delta_ratio in [1., 1/2., 1./4., 1./8.]:
+                        success, _ = self.system.is_free_path(
+                            newest,
+                            nearest_oppo,
+                            l_min=None,
+                            l_max=None,
+                            eps=self.steer_delta*delta_ratio #@TODO: WARNING ON ACCURACY!!!! We can simply loop!
+                        )
+                        if not success:
+                            break
                     if success:
                         print(f"DONE! {dir} Bridge found between {newest} {nearest_oppo}")
                         bridge_index = self.storage[dir].add_point(nearest_oppo) #ADD THE BRIDGE! add the nearest_oppo to the current graph
