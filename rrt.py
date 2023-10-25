@@ -30,9 +30,9 @@ class RRT():
             system (System): contains the Robotwrapper and a few helpers to perform computations in the configuration space.
             node_max (int, optional): maximum number of nodes in the tree. Defaults to 500000.
             iter_max (int, optional): maximum number of iterations. Defaults to 1000000.
-            N_bias (int, optional): _description_. Defaults to 10.
-            l_min (float, optional): _description_. Defaults to .2.
-            l_max (float, optional): _description_. Defaults to .5.
+            N_bias (int, optional): Every N_bias iterations, replace the random candidate by the goal itself. Defaults to 10.
+            l_min (float, optional): minimal length granted of the new edges added to the graph. Defaults to .2.
+            l_max (float, optional): maximal length granted of the new edges added to the graph. Defaults to .5.
             steer_delta (float, optional): _description_. Defaults to .1.
         '''
         self.system = system

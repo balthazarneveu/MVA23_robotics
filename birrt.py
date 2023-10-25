@@ -1,6 +1,5 @@
 import numpy as np
 from system import System
-from typing import Callable
 from utils.datastructures.storage import Storage
 from utils.datastructures.pathtree import PathTree
 from utils.datastructures.mtree import MTree
@@ -86,12 +85,14 @@ class BiRRT():
             BWD: MTree(self.backward_distance),
         }
         
-    def solve(self, qi: np.ndarray, qg: np.ndarray= None):
+    def solve(self, qi: np.ndarray, qg: np.ndarray= None) -> bool:
         """Run the BiRRT algorithm
         
         Args:
             qi (np.ndarray): initial configuration
             qg (np.ndarray, optional): goal/target configuration. 
+        Return:
+            sucess(bool): sucess if a path is found
         """
         assert qg is not None
         # Reset internal datastructures

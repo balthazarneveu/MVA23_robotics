@@ -1,14 +1,10 @@
 import hppfcl
-import math
 import numpy as np
 import pinocchio as pin
-import time
-from tqdm import tqdm
-from typing import Union, List, Tuple, Callable
+from typing import List, Tuple
 import itertools
 
-from utils.meshcat_viewer_wrapper import MeshcatVisualizer, colors
-from system import System
+from utils.meshcat_viewer_wrapper import colors
 from pinocchio.utils import rotate
 # SIMPLE CASE (reduced ~ 2D)
 def add_obstacles_reduced(robot):
@@ -40,6 +36,7 @@ def add_obstacles_reduced(robot):
     robot.collision_model.removeAllCollisionPairs()
     for a,b in itertools.product(robotBodies,envBodies):
         robot.collision_model.addCollisionPair(pin.CollisionPair(a,b))
+
 # HARD CASE (6 degrees of freedom)
 def add_obstacles_hard(robot):
     def addCylinderToUniverse(name, radius, length, placement, color=colors.red):
@@ -86,7 +83,8 @@ def add_obstacles_hard(robot):
 
 
 
-def add_special_locations(robot, viz, q_list:List[Tuple[np.ndarray, str, str]], robot_effector=22):
+def add_special_locations(robot, viz, q_list:List[Tuple[np.ndarray, str, str]], robot_effector=22) -> None:
+    """Add some markers at the source and target locations"""
     colors = {
         "red": [1., 0., 0., 1.],
         "green": [0., 1., 0., 1.]

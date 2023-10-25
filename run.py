@@ -4,7 +4,7 @@ import pinocchio as pin
 import time
 from typing import Union, List, Tuple, Callable
 
-from utils.meshcat_viewer_wrapper import MeshcatVisualizer, colors
+from utils.meshcat_viewer_wrapper import MeshcatVisualizer
 from system import System
 from pinocchio.utils import rotate
 from world import add_obstacles_reduced, add_obstacles_hard, add_special_locations
@@ -41,7 +41,6 @@ def solve(robot, viz, q_i, q_g, reduced=False):
     system = System(robot, dof=2 if reduced else 6)
     system.add_visualizer(viz)
     system.display_motion([q_i, q_g])
-    # print(system.distance(np.array([[-np.pi+0.1], [0.]]), np.array([[np.pi-0.1]])))
     return system
 
 def main(reduced=True):

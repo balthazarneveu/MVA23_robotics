@@ -1,7 +1,6 @@
 import numpy as np
-from typing import Union, List, Tuple, Callable
+from typing import Union, Tuple
 
-from utils.datastructures.mtree import MTree
 from utils.collision_wrapper import CollisionWrapper
 from pinocchio.robot_wrapper import RobotWrapper
 import time
