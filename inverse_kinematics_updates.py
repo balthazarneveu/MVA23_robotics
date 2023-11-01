@@ -1,7 +1,6 @@
 import pinocchio as pin
 import numpy as np
-import time
-from typing import List, Union, Optional, Tuple
+from typing import List, Tuple
 
 def extract_dim(vec: np.ndarray, start:int, end:int) -> np.ndarray:
     return vec[start:end, ...]
@@ -20,23 +19,22 @@ def get_config_velocity_update_translation_with_proj(
     When projector and vq_prev are None, this function behaves like the first iteration
     Which means that Identity projects into the whole space without constraint.
     Warning: Calling this function assumes that Foward Kinematics data is up to date.
-    `pin.framesForwardKinematics(rob.model, rob.data, q)`
 
     Args:
-        q (np.ndarray): current configuration state 
+        q (np.ndarray): current configuration state.
             - (joint angles, basis position, etc...)
             - 15 scalars in case of the Tiago robot
         rob (pin.RobotWrapper): Robot instance.
-        index_object (int): index of an object in the robot model (like effector or basis)
+        index_object (int): index of an object in the robot model (like effector or basis).
         o_M_target (pin.SE3): Target object position. SE(3) used here simply for its translation.
-        constraints (Tuple[int, int], optional): Constrain only certain dimension of the target vector (from a to b)
+        constraints (Tuple[int, int], optional): Constrain only certain dimension of the target vector (from a to b).
             - Defaults to (0, 3) meaning no constraint.
             - (0,1) means constraining on the x axis.
             - (1,2) means constraining on the y axis.
             - (2,3) means constraining on the z axis.
             - (0,2) means constraining on the x & y axis.
         projector (np.ndarray, optional): Previous task projector matrix. Defaults to None.
-            Required not to deviate from the previous task direction - only evolve in the orthogonal space.
+            - Required not to deviate from the previous task direction - only evolve in the orthogonal space.
         vq_prev (np.ndarray, optional): Previous task velocity update. Defaults to None.
 
     Returns:
